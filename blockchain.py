@@ -15,6 +15,7 @@ participants = {'Marcian'}
 def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
 
+
 def get_balance(participant):
     tx_sender = [[tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
     open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant]
@@ -32,15 +33,18 @@ def get_balance(participant):
 
     return amount_received - amount_sent
 
+
 def get_last_blockchain_value():
     """ Returns the last value of the current blockchain. """
     if len(blockchain) < 1:
         return None
     return blockchain[-1]
 
+
 def verify_transaction(transaction):
     sender_balance = get_balance(transaction['sender'])
     return sender_balance >= transaction['amount']
+
 
 def add_transaction(recipient, sender=owner, amount=1.0):
     """ Append a new value as well as the last blockchain value to the blockchain.

@@ -1,6 +1,7 @@
 from functools import reduce
 import hashlib as hl
 from collections import OrderedDict
+import json
 
 from hash_util import hash_string_256, hash_block
 
@@ -22,18 +23,39 @@ def load_data():
     with open('blockchain.txt', mode='r') as f:
         global blockchain
         global open_transactions
-        file_contents = f.readlines()
-        blockchain = file_contents[0]
-        open_transactions = file_contents[1]
 
-        
+        file_contents = f.readlines()
+
+        blockchain = json.loads(file_contents[0][:-1])
+        updated_blockchain = []
+        for block in blockchain:
+            updated_block = {
+                'previous_hash': block['previous_hash'],
+                'index': block['index'],
+                'proof': block['proof'],
+                'transactions': [OrderedDict(
+                    [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) for tx in block['transactions']]
+            }
+            updated_blockchain.append(updated_block)
+        blockchain = updated_blockchain
+
+        open_transactions = json.loads(file_contents[1])
+        updated_transactions = []
+        for tx in open_transactions:
+            updated_transaction = OrderedDict(
+                [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])])
+            updated_transactions.append(updated_transaction)
+        open_transactions = updated_transactions
+
+
+
 load_data()
 
 def save_data():
     with open('blockchain.txt', mode='w') as f:
-        f.write(str(blockchain))
+        f.write(json.dumps(blockchain))
         f.write('\n')
-        f.write(str(open_transactions))
+        f.write(json.dumps(open_transactions))
 
 def valid_proof(transactions, last_hash, proof):
     guess = (str(transactions) + str(last_hash) + str(proof)).encode()
@@ -130,7 +152,6 @@ def mine_block():
         'proof': proof
     }
     blockchain.append(block)
-    save_data()
     return True
 
 def get_transaction_value():
@@ -189,6 +210,7 @@ while waiting_for_input:
     elif user_choice == '2':
         if mine_block():
             open_transactions = []
+            save_data()
     elif user_choice == '3':
         print_blockchain_elements()
     elif user_choice == '4':

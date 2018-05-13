@@ -98,6 +98,9 @@ class Blockchain:
 
 
     def get_balance(self):
+        """Calculate and return the balance for current wallet hosted on Node"""
+        if self.hosting_node == None:
+            return None
         participant = self.hosting_node
         tx_sender = [[tx.amount for tx in block.transactions if tx.sender == participant] for block in self.__chain]
         open_tx_sender = [tx.amount for tx in self.__open_transactions if tx.sender == participant]

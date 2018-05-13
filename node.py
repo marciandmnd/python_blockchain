@@ -1,6 +1,6 @@
 from uuid import uuid4
 from blockchain import Blockchain
-from verification import Verification
+from utility.verification import Verification
 
 class Node:
     def __init__(self):
@@ -19,7 +19,7 @@ class Node:
         return user_input
 
     def print_blockchain_elements(self):
-        for block in self.blockchain.get_chain():
+        for block in self.blockchain.chain:
             print('Outputting block...')
             print(block)
         else:
@@ -58,7 +58,7 @@ class Node:
                 waiting_for_input = False
             else:
                 print('Input was invalid, please pick a value from the list!')
-            if not Verification.verify_chain(self.blockchain.get_chain()):
+            if not Verification.verify_chain(self.blockchain.chain):
                 print('Invalid blockchain!')
                 break
             print('Balance of {}: {:6.2f}'.format(
@@ -66,5 +66,7 @@ class Node:
         else:
             print('Exiting...')
 
-node = Node()
-node.listen_for_input()
+if __name__ == '__main__':
+    node = Node()
+    node.listen_for_input()
+    

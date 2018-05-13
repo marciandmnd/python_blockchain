@@ -3,33 +3,36 @@ import hashlib as hl
 import json
 import pickle
 
-from hash_util import hash_block
+from utility.hash_util import hash_block
+from utility.verification import Verification
 from block import Block
 from transaction import Transaction
-from verification import Verification
 
 MINING_REWARD = 10
 
+print(__name__)
 
 class Blockchain:
     def __init__(self, hosting_node_id):
         genesis_block = Block(0, '', [], 100, 0)
-        self.__chain = [genesis_block]
+        self.chain = [genesis_block]
         self.__open_transactions = []
-        self.load_data
+        self.load_data()
         self.hosting_node = hosting_node_id
 
-
-    def get_chain(self):
+    @property
+    def chain(self):
         return self.__chain[:]
 
+    @chain.setter
+    def chain(self, val):
+        self.__chain = val
 
     def get_open_transactions(self):
         return self.__open_transactions[:]
 
 
     def load_data(self):
-
         try:
             with open('blockchain.txt', mode='r') as f:
                 # file_contents = pickle.loads(f.read())
@@ -52,7 +55,7 @@ class Blockchain:
                     )
 
                     updated_blockchain.append(updated_block)
-                self.__chain = updated_blockchain
+                self.chain = updated_blockchain
 
                 open_transactions = json.loads(file_contents[1])
                 updated_transactions = []
@@ -68,7 +71,6 @@ class Blockchain:
     def save_data(self):
         try:
             with open('blockchain.txt', mode='w') as f:
-                # [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [tx.__dict__ for tx in block_el.transactions],block_el.proof, block_el.timestamp) for block_el in blockchain]]
                 # saveable_chain = [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [tx.__dict__ for tx in block_el.transactions],block_el.proof, block_el.timestamp) for block_el in blockchain]]
                 saveable_chain = [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [tx.__dict__ for tx in block_el.transactions], block_el.proof, block_el.timestamp) for block_el in self.__chain]]
                 f.write(json.dumps(saveable_chain))

@@ -12,7 +12,6 @@ from wallet import Wallet
 
 MINING_REWARD = 10
 
-print(__name__)
 
 class Blockchain:
     def __init__(self, public_key, node_id):
@@ -25,7 +24,6 @@ class Blockchain:
         self.resolve_conflicts = False
         self.load_data()
         
-
     @property
     def chain(self):
         return self.__chain[:]
@@ -37,20 +35,19 @@ class Blockchain:
     def get_open_transactions(self):
         return self.__open_transactions[:]
 
-
     def load_data(self):
         try:
             with open('blockchain-{}.txt'.format(self.node_id), mode='r') as f:
-                # file_contents = pickle.loads(f.read())
                 file_contents = f.readlines()
-
-                # blockchain = file_contents['chain']
-                # open_transactions = file_contents['ot']
 
                 blockchain = json.loads(file_contents[0][:-1])
                 updated_blockchain = []
                 for block in blockchain:
-                    converted_tx = [Transaction(tx['sender'], tx['recipient'], tx['signature'], tx['amount']) for tx in block['transactions']]
+                    converted_tx = [Transaction(
+                        tx['sender'],
+                        tx['recipient'],
+                        tx['signature'],
+                        tx['amount']) for tx in block['transactions']]
 
                     updated_block = Block(
                         block['index'],
@@ -79,23 +76,24 @@ class Blockchain:
     def save_data(self):
         try:
             with open('blockchain-{}.txt'.format(self.node_id), mode='w') as f:
-                # saveable_chain = [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [tx.__dict__ for tx in block_el.transactions],block_el.proof, block_el.timestamp) for block_el in blockchain]]
-                saveable_chain = [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [tx.__dict__ for tx in block_el.transactions], block_el.proof, block_el.timestamp) for block_el in self.__chain]]
+                saveable_chain = [
+                    block.__dict__ for block in 
+                    [
+                        Block(block_el.index,
+                              block_el.previous_hash,
+                              [tx.__dict__ for tx in block_el.transactions],
+                              block_el.proof,
+                              block_el.timestamp) for block_el in self.__chain
+                    ]
+                ]
                 f.write(json.dumps(saveable_chain))
                 f.write('\n')
                 saveable_tx = [tx.__dict__ for tx in self.__open_transactions]
                 f.write(json.dumps(saveable_tx))
                 f.write('\n')
                 f.write(json.dumps(list(self.__peer_nodes)))
-                # save_data = {
-                #     'chain': blockchain,
-                #     'ot': open_transactions
-                # }
-
-                # f.write(pickle.dumps(save_data))
         except IOError:
             print('Saving failed!')
-
 
     def proof_of_work(self):
         last_block = self.__chain[-1]
@@ -105,11 +103,10 @@ class Blockchain:
             proof += 1
         return proof
 
-
     def get_balance(self, sender=None):
         """Calculate and return the balance for current wallet hosted on Node"""
-        if sender == None:
-            if self.public_key == None:
+        if sender is None:
+            if self.public_key is None:
                 return None
             participant = self.public_key
         else:
@@ -124,13 +121,11 @@ class Blockchain:
 
         return amount_received - amount_sent
 
-
     def get_last_blockchain_value(self):
         """ Returns the last value of the current blockchain. """
         if len(self.__chain) < 1:
             return None
         return self.__chain[-1]
-
 
     def add_transaction(self, recipient, sender, signature, amount=1.0, is_receiving=False):
         """ Append a new value as well as the last blockchain value to the blockchain.

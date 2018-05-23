@@ -47,8 +47,12 @@ class Wallet:
         private_key = RSA.generate(1024, Crypto.Random.new().read)
         public_key = private_key.publickey()
         return (
-            binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-            binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'),
+            binascii
+            .hexlify(private_key.exportKey(format='DER'))
+            .decode('ascii'),
+            binascii
+            .hexlify(public_key.exportKey(format='DER'))
+            .decode('ascii')
         )
 
 
